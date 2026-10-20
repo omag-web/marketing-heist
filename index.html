@@ -102,7 +102,7 @@ h1.md{font-size:84px}
 .logo-lg.sm .ph-word .w1{font-size:28px}
 .logo-lg.sm .ph-word .w2{font-size:140px;margin-top:8px}
 .tagline{font:600 34px/1 var(--mono);letter-spacing:.42em;text-transform:uppercase;color:var(--red2);margin-top:56px}
-.standby-status{margin-top:56px;font:600 26px/1 var(--mono);letter-spacing:.34em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:18px}
+.standby-status{margin-top:96px;font:600 26px/1 var(--mono);letter-spacing:.34em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:18px}
 .dot{width:16px;height:16px;border-radius:50%;background:var(--red);box-shadow:0 0 16px var(--red);animation:pulse 1.6s ease-in-out infinite}
 .foot{position:absolute;left:0;right:0;bottom:0;text-align:center;font:500 20px/1 var(--mono);letter-spacing:.26em;color:var(--faint);text-transform:uppercase}
 .dial .ring{transform-origin:100px 100px;animation:spin 60s linear infinite}
@@ -359,7 +359,7 @@ const eyebrow=(t,i=0)=>`<div class="eyebrow rise" style="--i:${i}">${t}</div>`;
    ========================================================= */
 const SCREENS={
 standby:()=>`<section class="scr center">
-  <div class="logo-lg rise">${logoLarge(1.38)}</div>
+  <div class="logo-lg rise">${logoLarge(1.12)}</div>
   ${CONFIG.logo&&CONFIG.logoHasTagline?'':`<div class="tagline" ${r(1)}>Steal the best ideas in the room</div>`}
   <div class="standby-status" ${r(2)}><span class="dot"></span>Mission begins shortly</div>
   <div class="foot" ${r(3)}>${esc(CONFIG.event)} &nbsp;·&nbsp; ${esc(CONFIG.session)}</div></section>`,
