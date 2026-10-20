@@ -16,6 +16,14 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:#000;overflow:hidden}
 body.idle,body.idle *{cursor:none!important}
+#fsBtn{position:fixed;top:16px;right:16px;z-index:1000;width:48px;height:48px;display:grid;place-items:center;border:1px solid #334055;background:rgba(10,13,19,.85);color:#cfd6e0;cursor:pointer;padding:0;transition:opacity .3s,background .2s,color .2s}
+#fsBtn:hover{background:#e5322d;border-color:#e5322d;color:#fff}
+#fsBtn:focus-visible{outline:2px solid #ff4b3e;outline-offset:2px}
+#fsBtn svg{width:24px;height:24px}
+#fsBtn .exit{display:none}
+body.fs #fsBtn .enter{display:none}
+body.fs #fsBtn .exit{display:block}
+body.idle #fsBtn{opacity:0;pointer-events:none}
 
 /* ---------- 1920x1080 STAGE ---------- */
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;color:var(--text);font-family:var(--body);
@@ -102,7 +110,7 @@ h1.md{font-size:84px}
 .logo-lg.sm .ph-word .w1{font-size:28px}
 .logo-lg.sm .ph-word .w2{font-size:140px;margin-top:8px}
 .tagline{font:600 34px/1 var(--mono);letter-spacing:.42em;text-transform:uppercase;color:var(--red2);margin-top:56px}
-.standby-status{margin-top:96px;font:600 26px/1 var(--mono);letter-spacing:.34em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:18px}
+.standby-status{position:absolute;left:0;right:0;bottom:104px;justify-content:center;font:600 26px/1 var(--mono);letter-spacing:.34em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:18px}
 .dot{width:16px;height:16px;border-radius:50%;background:var(--red);box-shadow:0 0 16px var(--red);animation:pulse 1.6s ease-in-out infinite}
 .foot{position:absolute;left:0;right:0;bottom:0;text-align:center;font:500 20px/1 var(--mono);letter-spacing:.26em;color:var(--faint);text-transform:uppercase}
 .dial .ring{transform-origin:100px 100px;animation:spin 60s linear infinite}
@@ -212,6 +220,10 @@ h1.md{font-size:84px}
 </style>
 </head>
 <body>
+<button id="fsBtn" type="button" aria-label="Toggle full screen" title="Full screen (F)">
+  <svg class="enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6"/></svg>
+  <svg class="exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M9 3v6H3M15 3v6h6M9 21v-6H3M15 21v-6h6"/></svg>
+</button>
 <div id="stage" class="nohud">
   <header id="hud">
     <div class="hud-l"><div class="mark" id="hudMark"></div><div><div class="wm">MARKETING HEIST</div><div class="wm-sub" id="hudSub"></div></div></div>
@@ -358,7 +370,7 @@ const eyebrow=(t,i=0)=>`<div class="eyebrow rise" style="--i:${i}">${t}</div>`;
    SCREENS
    ========================================================= */
 const SCREENS={
-standby:()=>`<section class="scr center">
+standby:()=>`<section class="scr center" style="padding-bottom:190px">
   <div class="logo-lg rise">${logoLarge(1.38)}</div>
   ${CONFIG.logo&&CONFIG.logoHasTagline?'':`<div class="tagline" ${r(1)}>Steal the best ideas in the room</div>`}
   <div class="standby-status" ${r(2)}><span class="dot"></span>Mission begins shortly</div>
@@ -592,7 +604,9 @@ async function toggleFs(){
    STAGE SCALING, WAKE LOCK, CURSOR
    ========================================================= */
 function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(${(innerWidth-1920*s)/2}px,${(innerHeight-1080*s)/2}px) scale(${s})`}
-addEventListener('resize',fit);document.addEventListener('fullscreenchange',fit);
+addEventListener('resize',fit);
+document.addEventListener('fullscreenchange',()=>{fit();document.body.classList.toggle('fs',!!document.fullscreenElement)});
+$('fsBtn').addEventListener('click',e=>{toggleFs();e.currentTarget.blur()});
 let wl=null;
 async function wake(){try{if('wakeLock' in navigator&&!wl&&document.visibilityState==='visible'){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>{wl=null})}}catch(_){}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')wake()});

@@ -11,7 +11,7 @@ Projector-only presentation for the Marketing Functional Area session at the 202
 | Space | Start / pause timer |
 | + / − | Add / remove 1 minute |
 | R, R | Reset current timer (press twice) |
-| F | Full screen |
+| F | Full screen (or the corner button that appears when you move the mouse) |
 | B or . | Blank screen (clicker "blank" button) |
 | M | Sound on / off |
 | 1–6 | Reveal: select crew (resets the 2:00 pitch clock) |
