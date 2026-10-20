@@ -168,6 +168,9 @@ h1.md{font-size:84px}
 .nolist li{font:600 34px/1 var(--display);text-transform:uppercase;display:flex;gap:18px;align-items:center}
 .nolist li::before{content:"✕";color:var(--red2);font-weight:700}
 .twist .callout{margin-top:30px}
+.golist{list-style:none;margin:26px 0 0;padding:0;display:flex;flex-direction:column;gap:14px}
+.golist li{font:600 34px/1 var(--display);text-transform:uppercase;display:flex;gap:18px;align-items:center}
+.golist b{font:600 20px var(--mono);color:var(--red2);border:2px solid var(--red);width:44px;height:44px;display:grid;place-items:center;flex:none}
 .twist .callout ol{gap:34px;font-size:30px;white-space:nowrap}
 
 /* ---------- VAULT ---------- */
@@ -403,9 +406,9 @@ heist:()=>`<section class="scr stack">
 twist:()=>`<section class="scr split twist">
   <div><div ${r(0)}><span class="badge">⚠ Priority transmission</span></div>
     <h1 ${r(1)}>Mission<br>compromised.</h1>
-    <h2 ${r(2)}>Your budget just vanished.</h2>
-    <p class="lead" ${r(3)}>Leadership froze all new spending, effective immediately. Your plan has to work with the people, tools, and channels you already have.</p>
-    <ul class="nolist" ${r(4)}><li>No new spending</li><li>No new hires or contractors</li><li>No new software or paid tools</li></ul>
+    <h2 ${r(2)}>New intelligence has arrived.</h2>
+    <p class="lead" ${r(3)}>Something just changed in your case. Open your folder and pull out the twist card. Your plan has to adapt.</p>
+    <ul class="golist" ${r(4)}><li><b>01</b>Check your folder for the twist</li><li><b>02</b>Rework your plan around it</li><li><b>03</b>Get ready to pitch</li></ul>
     <div class="callout" ${r(5)}><div class="ch">Your 2-minute pitch</div><ol><li><span>1</span>The challenge</li><li><span>2</span>How you adapted</li><li><span>3</span>Your best idea</li></ol></div>
   </div>${timerPanel('split')}</section>`,
 
