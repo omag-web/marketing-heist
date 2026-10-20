@@ -34,8 +34,8 @@ body.idle,body.idle *{cursor:none!important}
 #hud{position:absolute;left:96px;right:96px;top:36px;height:80px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);z-index:2;transition:opacity .4s}
 #stage.nohud #hud{opacity:0}
 .hud-l{display:flex;align-items:center;gap:18px}
-.hud-l .mark{width:54px;height:54px;display:grid;place-items:center}
-.hud-l .mark img{max-width:54px;max-height:54px}
+.hud-l .mark{min-width:54px;height:58px;display:grid;place-items:center}
+.hud-l .mark img{max-width:96px;max-height:58px;filter:drop-shadow(0 0 1px rgba(255,255,255,.55))}
 .wm{font:700 26px/1 var(--display);letter-spacing:.22em}
 .wm-sub{font:500 15px/1 var(--mono);letter-spacing:.2em;color:var(--dim);margin-top:8px}
 .hud-r{display:flex;align-items:center;gap:30px}
@@ -94,7 +94,7 @@ h1.md{font-size:84px}
 
 /* ---------- STANDBY / COMPLETE ---------- */
 .logo-lg{display:flex;align-items:center;justify-content:center;gap:56px}
-.logo-lg img{max-width:1300px;max-height:560px}
+.logo-lg img{max-width:1300px;max-height:560px;filter:drop-shadow(0 0 1.5px rgba(255,255,255,.5)) drop-shadow(0 0 60px rgba(229,50,45,.28))}
 .ph-word{text-align:left}
 .ph-word .w1{font:600 46px/1 var(--mono);letter-spacing:.62em;color:var(--soft)}
 .ph-word .w2{font:700 230px/.86 var(--display);letter-spacing:.02em;margin-top:14px}
@@ -102,7 +102,7 @@ h1.md{font-size:84px}
 .logo-lg.sm .ph-word .w1{font-size:28px}
 .logo-lg.sm .ph-word .w2{font-size:140px;margin-top:8px}
 .tagline{font:600 34px/1 var(--mono);letter-spacing:.42em;text-transform:uppercase;color:var(--red2);margin-top:56px}
-.standby-status{margin-top:110px;font:600 26px/1 var(--mono);letter-spacing:.34em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:18px}
+.standby-status{margin-top:56px;font:600 26px/1 var(--mono);letter-spacing:.34em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:18px}
 .dot{width:16px;height:16px;border-radius:50%;background:var(--red);box-shadow:0 0 16px var(--red);animation:pulse 1.6s ease-in-out infinite}
 .foot{position:absolute;left:0;right:0;bottom:0;text-align:center;font:500 20px/1 var(--mono);letter-spacing:.26em;color:var(--faint);text-transform:uppercase}
 .dial .ring{transform-origin:100px 100px;animation:spin 60s linear infinite}
@@ -232,9 +232,9 @@ h1.md{font-size:84px}
    CONFIG — edit here
    ========================================================= */
 const CONFIG = {
-  logo: '',               // full logo lockup for opening/closing screens, e.g. 'assets/logo.png'
-  logoMark: '',           // optional small icon for the top bar, e.g. 'assets/logo-mark.png'
-  logoHasTagline: false,  // true if the logo artwork already includes "Steal the best ideas in the room"
+  logo: 'assets/logo.png',          // full logo lockup for opening/closing screens
+  logoMark: 'assets/logo-mark.png', // small icon for the top bar
+  logoHasTagline: true,   // true if the logo artwork already includes "Steal the best ideas in the room"
   event: 'NLC-RISC 2026 Staff Conference',
   session: 'Marketing Functional Area',
   host: 'Facilitated by Matt Burleson · OMAG',
@@ -359,7 +359,7 @@ const eyebrow=(t,i=0)=>`<div class="eyebrow rise" style="--i:${i}">${t}</div>`;
    ========================================================= */
 const SCREENS={
 standby:()=>`<section class="scr center">
-  <div class="logo-lg rise">${logoLarge(1)}</div>
+  <div class="logo-lg rise">${logoLarge(1.38)}</div>
   ${CONFIG.logo&&CONFIG.logoHasTagline?'':`<div class="tagline" ${r(1)}>Steal the best ideas in the room</div>`}
   <div class="standby-status" ${r(2)}><span class="dot"></span>Mission begins shortly</div>
   <div class="foot" ${r(3)}>${esc(CONFIG.event)} &nbsp;·&nbsp; ${esc(CONFIG.session)}</div></section>`,
@@ -443,7 +443,7 @@ getaway:()=>`<section class="scr split">
   </div>${timerPanel('split')}</section>`,
 
 complete:()=>`<section class="scr center">
-  <div class="logo-lg sm rise">${logoLarge(.62)}</div>
+  <div class="logo-lg sm rise">${logoLarge(.8)}</div>
   <h1 ${r(1)} style="margin-top:70px">Mission <span class="red">complete.</span></h1>
   <p class="lead" ${r(2)} style="text-align:center">The best ideas were in the room all along. Now go put one to work.</p>
   <div class="foot" ${r(3)}>${esc(CONFIG.host)} &nbsp;·&nbsp; ${esc(CONFIG.event)}</div></section>`
