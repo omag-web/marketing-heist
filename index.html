@@ -457,7 +457,7 @@ casing:()=>`<section class="scr split">
 heist:()=>`<section class="scr stack">
   <div class="head"><div>${eyebrow('Phase 03 · The Heist')}
     <h1 class="md" ${r(1)}>Open your case file.</h1>
-    <p class="lead" ${r(2)}>Build a plan your organization could actually launch. Be ready to pitch it in two minutes.</p></div>
+    <p class="lead" ${r(2)}>You have <span class="red">12 minutes</span> to prepare a <span class="red">2-minute pitch</span>: a plan your organization could actually launch.</p></div>
     ${timerPanel('compact')}</div>
   <div class="cards" ${r(3)}>${MISSIONS.map((m,i)=>`<article class="card panel"><div class="no">Case ${two(i+1)} · Operation</div><h3>${esc(m.title)}</h3><p>${esc(m.goal)}</p></article>`).join('')}</div>
 </section>`,
