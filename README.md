@@ -26,7 +26,7 @@ Projector-only presentation for the Marketing Functional Area session at the 202
 
 ## Logo
 
-`assets/logo.png` is the full lockup with a transparent background and lettering recolored for the dark stage. It's used on the opening and closing screens. `assets/logo-mark.png` (vault + spy) is the small top-bar mark. To swap either one, replace the file or edit the `logo` / `logoMark` paths at the top of the script in `index.html`. If a file is missing, a built-in vault-dial placeholder shows instead.
+`assets/MH-Logo.png` is the full lockup (transparent background, built for the dark stage). It's used on the opening and closing screens. `assets/logo-mark.png` (vault + spy) is the small top-bar mark. To swap either one, replace the file or edit the `logo` / `logoMark` paths at the top of the script in `index.html`. If a file is missing, a built-in vault-dial placeholder shows instead.
 
 ## Deploy
 
