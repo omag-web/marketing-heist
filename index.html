@@ -249,7 +249,6 @@ const CONFIG = {
   logoHasTagline: true,   // true if the logo artwork already includes "Steal the best ideas in the room"
   event: 'NLC-RISC 2026 Staff Conference',
   session: 'Marketing Functional Area',
-  host: 'Facilitated by Matt Burleson · OMAG',
   pitchSeconds: 120,
   storageKey: 'marketing-heist-mc-v2'
 };
@@ -458,7 +457,7 @@ complete:()=>`<section class="scr center">
   <div class="logo-lg sm rise">${logoLarge(.98)}</div>
   <h1 ${r(1)} style="margin-top:70px">Mission <span class="red">complete.</span></h1>
   <p class="lead" ${r(2)} style="text-align:center">The best ideas were in the room all along. Now go put one to work.</p>
-  <div class="foot" ${r(3)}>${esc(CONFIG.host)} &nbsp;·&nbsp; ${esc(CONFIG.event)}</div></section>`
+  <div class="foot" ${r(3)}>${esc(CONFIG.event)} &nbsp;·&nbsp; ${esc(CONFIG.session)}</div></section>`
 };
 
 /* =========================================================
