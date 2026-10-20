@@ -16,10 +16,10 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:#000;overflow:hidden}
 body.idle,body.idle *{cursor:none!important}
-#fsBtn{position:fixed;top:16px;right:16px;z-index:1000;width:48px;height:48px;display:grid;place-items:center;border:1px solid #334055;background:rgba(10,13,19,.85);color:#cfd6e0;cursor:pointer;padding:0;transition:opacity .3s,background .2s,color .2s}
-#fsBtn:hover{background:#e5322d;border-color:#e5322d;color:#fff}
+#fsBtn{position:fixed;top:10px;right:10px;z-index:1000;width:28px;height:28px;display:grid;place-items:center;border:0;background:transparent;color:#cfd6e0;cursor:pointer;padding:0;opacity:.35;transition:opacity .3s,color .2s}
+#fsBtn:hover{opacity:.9;color:#fff}
 #fsBtn:focus-visible{outline:2px solid #ff4b3e;outline-offset:2px}
-#fsBtn svg{width:24px;height:24px}
+#fsBtn svg{width:16px;height:16px}
 #fsBtn .exit{display:none}
 body.fs #fsBtn .enter{display:none}
 body.fs #fsBtn .exit{display:block}
