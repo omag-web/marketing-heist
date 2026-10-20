@@ -253,6 +253,7 @@ const CONFIG = {
   event: 'NLC-RISC 2026 Staff Conference',
   session: 'Marketing Functional Area',
   pitchSeconds: 120,
+  volume: 0.8,           // master sound level, 0–1 (M key mutes)
   storageKey: 'marketing-heist-mc-v2'
 };
 
@@ -330,12 +331,30 @@ const clockStr=ms=>new Date(ms).toLocaleTimeString([], {hour:'numeric',minute:'2
 /* =========================================================
    SOUND — synthesized with Web Audio, no files, works offline
    ========================================================= */
-let actx=null;
-function ac(){if(!actx){try{actx=new (window.AudioContext||window.webkitAudioContext)()}catch(_){return null}}if(actx.state==='suspended')actx.resume();return actx}
-function tone(c,type,f0,f1,start,dur,vol){const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f0,start);if(f1)o.frequency.linearRampToValueAtTime(f1,start+dur);g.gain.setValueAtTime(0.0001,start);g.gain.exponentialRampToValueAtTime(vol,start+.02);g.gain.setValueAtTime(vol,start+dur-.05);g.gain.exponentialRampToValueAtTime(0.0001,start+dur);o.connect(g).connect(c.destination);o.start(start);o.stop(start+dur+.02)}
-function siren(){if(S.muted)return;const c=ac();if(!c)return;const t=c.currentTime;for(let i=0;i<4;i++){tone(c,'sawtooth',620,980,t+i*.6,.3,.09);tone(c,'sawtooth',980,620,t+i*.6+.3,.3,.09)}}
-function chime(){if(S.muted)return;const c=ac();if(!c)return;const t=c.currentTime;[880,660,880,660].forEach((f,i)=>tone(c,'triangle',f,0,t+i*.22,.2,.18))}
-function blip(){if(S.muted)return;const c=ac();if(!c)return;tone(c,'sine',1400,0,c.currentTime,.07,.05)}
+let actx=null,master=null;
+function ac(){
+  if(!actx){try{
+    actx=new (window.AudioContext||window.webkitAudioContext)();
+    const lp=actx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1800;lp.Q.value=.4;  // rounds off harsh edges
+    master=actx.createGain();master.gain.value=CONFIG.volume;master.connect(lp).connect(actx.destination);
+  }catch(_){return null}}
+  if(actx.state==='suspended')actx.resume();return actx}
+// soft envelope: gentle fade in, gentle fade out — no clicks or sudden onsets
+function tone(c,type,f0,f1,start,dur,vol,attack,release){
+  const o=c.createOscillator(),g=c.createGain();o.type=type;
+  o.frequency.setValueAtTime(f0,start);if(f1)o.frequency.exponentialRampToValueAtTime(f1,start+dur);
+  g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(vol,start+attack);
+  g.gain.setValueAtTime(vol,Math.max(start+attack,start+dur-release));g.gain.linearRampToValueAtTime(0,start+dur);
+  o.connect(g).connect(master);o.start(start);o.stop(start+dur+.05)}
+// Twist: a low swell under three soft, falling two-tone pulses
+function siren(){if(S.muted)return;const c=ac();if(!c)return;const t=c.currentTime;
+  tone(c,'sine',98,0,t,2.8,.10,.6,1.2);
+  for(let i=0;i<3;i++){const s=t+.25+i*.8;tone(c,'triangle',523,392,s,.6,.07,.12,.3);tone(c,'sine',262,196,s,.6,.05,.12,.3)}}
+// Time's up: a soft two-note bell with a long, natural decay
+function chime(){if(S.muted)return;const c=ac();if(!c)return;const t=c.currentTime;
+  [[659,0],[880,.35]].forEach(([f,d])=>{tone(c,'sine',f,0,t+d,1.6,.08,.02,1.4);tone(c,'sine',f*2,0,t+d,.9,.015,.02,.8)})}
+// Crew select / sound-on: a quiet tick
+function blip(){if(S.muted)return;const c=ac();if(!c)return;tone(c,'sine',880,0,c.currentTime,.12,.03,.02,.08)}
 
 /* =========================================================
    MARKUP HELPERS
