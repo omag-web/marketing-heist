@@ -256,8 +256,9 @@ const CONFIG = {
   volume: 0.8,           // master sound level, 0–1 (M key mutes)
   music: 'assets/Sly Minor Motif.mp3', // loops on the opening and closing screens
   musicVolume: 0.36,     // 0–1
-  musicFadeIn: 4000,     // ms
-  musicFadeOut: 1800,    // ms
+  musicFadeIn: 4000,     // ms, when the opening/closing screen appears
+  musicFadeOut: 3000,    // ms, when you leave it
+  musicLoopFade: 3000,   // ms, fade in/out at the start and end of every loop
   storageKey: 'marketing-heist-mc-v2'
 };
 
@@ -360,27 +361,38 @@ function chime(){if(S.muted)return;const c=ac();if(!c)return;const t=c.currentTi
 // Crew select / sound-on: a quiet tick
 function blip(){if(S.muted)return;const c=ac();if(!c)return;tone(c,'sine',880,0,c.currentTime,.12,.03,.02,.08)}
 
-/* ---------- Background music (opening + closing screens) ---------- */
+/* ---------- Background music (opening + closing screens) ----------
+   Two envelopes multiply together:
+   - screen fade: rises when you land on the opening/closing screen, falls when you leave
+   - loop fade:   every pass through the track fades in at the start and out at the end
+   Loudness is mapped on a dB curve so fades sound even to the ear instead of
+   "holding, then dropping off a cliff". */
 const MUSIC_SCREENS=['standby','complete'];
-const music=new Audio(encodeURI(CONFIG.music));music.loop=true;music.preload='auto';music.volume=0;
-let mTimer=null;
-function fadeMusic(to,ms){
-  clearInterval(mTimer);
-  if(to>0&&music.paused){
-    music.volume=0;
-    music.play().catch(()=>{clearInterval(mTimer);music.volume=0});  // autoplay blocked: wait silently for first click/key, then fade from zero
-  }
-  const from=music.volume,t0=performance.now();
-  mTimer=setInterval(()=>{
-    const k=Math.min(1,(performance.now()-t0)/ms),e=k*k*(3-2*k);   // smooth ease
-    music.volume=Math.max(0,Math.min(1,from+(to-from)*e));
-    if(k>=1){clearInterval(mTimer);if(to===0)music.pause()}
-  },40);
+const music=new Audio(encodeURI(CONFIG.music));music.preload='auto';music.loop=false;music.volume=0;
+let mGain=0,mTarget=0,mTimer=null,mLast=0;
+const perceptual=g=>g<=0.001?0:Math.pow(10,(g-1)*2.4);           // 0..1 → -48 dB..0 dB
+function loopEnv(){
+  const d=music.duration,t=music.currentTime;if(!isFinite(d)||!d)return 0;
+  const f=Math.min(CONFIG.musicLoopFade/1000,d/4);
+  return Math.max(0,Math.min(1,t/f,(d-t)/f));
 }
+function musicTick(){
+  const now=performance.now(),dt=now-mLast;mLast=now;
+  if(mTarget>mGain)mGain=Math.min(mTarget,mGain+dt/CONFIG.musicFadeIn);
+  else if(mTarget<mGain)mGain=Math.max(mTarget,mGain-dt/CONFIG.musicFadeOut);
+  music.volume=Math.max(0,Math.min(1,CONFIG.musicVolume*perceptual(mGain*loopEnv())));
+  if(mGain===0&&mTarget===0){music.pause();clearInterval(mTimer);mTimer=null}
+}
+function startTicker(){if(!mTimer){mLast=performance.now();mTimer=setInterval(musicTick,30)}}
+music.addEventListener('ended',()=>{if(mTarget>0){music.currentTime=0;music.play().catch(()=>{})}});  // loop manually so each pass fades
 function syncMusic(){
   const want=!S.muted&&MUSIC_SCREENS.includes(cur().id);
-  if(want){if(music.paused||music.volume<CONFIG.musicVolume)fadeMusic(CONFIG.musicVolume,CONFIG.musicFadeIn)}
-  else if(!music.paused)fadeMusic(0,CONFIG.musicFadeOut);
+  mTarget=want?1:0;
+  if(want&&music.paused){
+    if(mGain===0){try{music.currentTime=0}catch(_){}}
+    music.volume=0;
+    music.play().then(startTicker).catch(()=>{mGain=0});              // autoplay blocked: wait silently for first click/key
+  }else if(!music.paused)startTicker();
 }
 ['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{if(music.paused)syncMusic()},true));
 

@@ -30,7 +30,7 @@ Projector-only presentation for the Marketing Functional Area session at the 202
 
 ## Music
 
-`assets/Sly Minor Motif.mp3` loops on the opening and closing screens. It fades in over 4 seconds and fades out over about 2 seconds when you move to another phase. Browsers block audio until the first click or key press, so at the venue click the page once (or press F for full screen) and the music fades up from silence. M mutes music and effects together. Adjust `musicVolume` at the top of the script in `index.html`.
+`assets/Sly Minor Motif.mp3` loops on the opening and closing screens. It fades in over 4 seconds, fades out over 3 seconds when you move to another phase, and fades out and back in at every loop point. Browsers block audio until the first click or key press, so at the venue click the page once (or press F for full screen) and the music fades up from silence. M mutes music and effects together. Adjust `musicVolume` at the top of the script in `index.html`.
 
 ## Deploy
 
