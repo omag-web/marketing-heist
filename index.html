@@ -254,6 +254,10 @@ const CONFIG = {
   session: 'Marketing Functional Area',
   pitchSeconds: 120,
   volume: 0.8,           // master sound level, 0–1 (M key mutes)
+  music: 'assets/Sly Minor Motif.mp3', // loops on the opening and closing screens
+  musicVolume: 0.55,     // 0–1
+  musicFadeIn: 4000,     // ms
+  musicFadeOut: 1800,    // ms
   storageKey: 'marketing-heist-mc-v2'
 };
 
@@ -355,6 +359,30 @@ function chime(){if(S.muted)return;const c=ac();if(!c)return;const t=c.currentTi
   [[659,0],[880,.35]].forEach(([f,d])=>{tone(c,'sine',f,0,t+d,1.6,.08,.02,1.4);tone(c,'sine',f*2,0,t+d,.9,.015,.02,.8)})}
 // Crew select / sound-on: a quiet tick
 function blip(){if(S.muted)return;const c=ac();if(!c)return;tone(c,'sine',880,0,c.currentTime,.12,.03,.02,.08)}
+
+/* ---------- Background music (opening + closing screens) ---------- */
+const MUSIC_SCREENS=['standby','complete'];
+const music=new Audio(encodeURI(CONFIG.music));music.loop=true;music.preload='auto';music.volume=0;
+let mTimer=null;
+function fadeMusic(to,ms){
+  clearInterval(mTimer);
+  if(to>0&&music.paused){
+    music.volume=0;
+    music.play().catch(()=>{clearInterval(mTimer);music.volume=0});  // autoplay blocked: wait silently for first click/key, then fade from zero
+  }
+  const from=music.volume,t0=performance.now();
+  mTimer=setInterval(()=>{
+    const k=Math.min(1,(performance.now()-t0)/ms),e=k*k*(3-2*k);   // smooth ease
+    music.volume=Math.max(0,Math.min(1,from+(to-from)*e));
+    if(k>=1){clearInterval(mTimer);if(to===0)music.pause()}
+  },40);
+}
+function syncMusic(){
+  const want=!S.muted&&MUSIC_SCREENS.includes(cur().id);
+  if(want){if(music.paused||music.volume<CONFIG.musicVolume)fadeMusic(CONFIG.musicVolume,CONFIG.musicFadeIn)}
+  else if(!music.paused)fadeMusic(0,CONFIG.musicFadeOut);
+}
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{if(music.paused)syncMusic()},true));
 
 /* =========================================================
    MARKUP HELPERS
@@ -497,6 +525,7 @@ function render(){
     img.addEventListener('error',fail,{once:true});if(img.complete&&!img.naturalWidth)fail();
   });
   paintTimer(true);
+  syncMusic();
 }
 function renderHud(){
   $('hudSub').textContent=`${CONFIG.event} · ${CONFIG.session}`.toUpperCase();
@@ -600,7 +629,7 @@ document.addEventListener('keydown',e=>{
       break;
     case 'f':case 'F':toggleFs();break;
     case 'b':case 'B':case '.':blank.classList.toggle('on');break;
-    case 'm':case 'M':S.muted=!S.muted;save();toast(S.muted?'Sound off':'Sound on');if(!S.muted)blip();break;
+    case 'm':case 'M':S.muted=!S.muted;save();toast(S.muted?'Sound off':'Sound on');if(!S.muted)blip();syncMusic();break;
     case 'h':case 'H':case '?':help.classList.toggle('on');break;
     case 'Escape':help.classList.remove('on');break;
     case 'd':case 'D':if(p.id==='reveal')toggleDone();break;

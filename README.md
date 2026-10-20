@@ -28,6 +28,10 @@ Projector-only presentation for the Marketing Functional Area session at the 202
 
 `assets/MH-Logo.png` is the full lockup (transparent background, built for the dark stage). It's used on the opening and closing screens. `assets/logo-mark.png` (vault + spy) is the small top-bar mark. To swap either one, replace the file or edit the `logo` / `logoMark` paths at the top of the script in `index.html`. If a file is missing, a built-in vault-dial placeholder shows instead.
 
+## Music
+
+`assets/Sly Minor Motif.mp3` loops on the opening and closing screens. It fades in over 4 seconds and fades out over about 2 seconds when you move to another phase. Browsers block audio until the first click or key press, so at the venue click the page once (or press F for full screen) and the music fades up from silence. M mutes music and effects together. Adjust `musicVolume` at the top of the script in `index.html`.
+
 ## Deploy
 
 GitHub repo → Settings → Pages → Deploy from branch → `main` / root. Keep a local copy of the folder on the presenter laptop as the offline fallback.
