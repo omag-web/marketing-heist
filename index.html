@@ -175,15 +175,16 @@ h1.md{font-size:84px}
 
 /* ---------- VAULT ---------- */
 .vault{display:flex;gap:26px;flex:1}
-.vault .card{flex:1;padding:40px 40px}
-.vault .card h3{font-size:54px}
-.vault .card p{font-size:32px}
-.vault .card .sub{font-size:25px;color:var(--dim);margin-top:auto}
-.vault .big{font:700 110px/1 var(--display);color:rgba(229,50,45,.9)}
+.lead.vault-call{margin-top:14px;font-size:30px;color:var(--text)}
+.vault .card{flex:1;padding:30px 36px;gap:10px}
+.vault .card h3{font-size:48px}
+.vault .card p{font-size:29px}
+.vault .card .sub{font-size:24px;color:var(--dim);margin-top:auto}
+.vault .big{font:700 80px/1 var(--display);color:rgba(229,50,45,.9)}
 .vault[data-focus] .card{opacity:.32}
 .vault[data-focus] .card.focus{opacity:1;flex:2.1;border-color:var(--red);box-shadow:0 0 0 2px var(--red),0 0 60px rgba(229,50,45,.3)}
-.vault[data-focus] .card.focus h3{font-size:72px}
-.vault[data-focus] .card.focus p{font-size:40px}
+.vault[data-focus] .card.focus h3{font-size:64px}
+.vault[data-focus] .card.focus p{font-size:36px}
 
 /* ---------- TAKE / GETAWAY ---------- */
 .quote{margin-top:44px;font:600 44px/1.2 var(--display);text-transform:uppercase;padding-left:34px;border-left:6px solid var(--red);max-width:1060px}
@@ -491,10 +492,11 @@ break:()=>`<section class="scr center">
 vault:()=>{const V=[['The Big Score','What campaign, project, or strategy worked at your organization?','What did you do, what did it take, what happened?'],
   ['Tools of the Trade','What tool, workflow, or template makes your work easier?','Software, AI, templates, processes. Show and tell.'],
   ['The Unsolved Case',"What problem haven't you cracked yet?",'Name it. Someone in this room may have the answer.']];
-  return `<section class="scr stack">
+  return `<section class="scr stack" style="gap:30px">
   <div class="head"><div>${eyebrow('Phase 06 · The Vault')}
     <h1 class="md" ${r(1)}>Open the vault.</h1>
-    <p class="lead" ${r(2)}>No more case files. Real campaigns, real tools, real problems from the people in this room.</p></div>
+    <p class="lead" ${r(2)}>No more case files. Real campaigns, real tools, real problems from the people in this room.</p>
+    <p class="lead vault-call" ${r(3)}><span class="red">Every great heist needs a score.</span> Share one real success, one tool worth borrowing, or one problem the crew can help crack.</p></div>
     ${timerPanel('compact')}</div>
   <div class="vault" ${S.vault>=0?`data-focus="${S.vault}"`:''} ${r(3)}>${V.map((v,i)=>`<article class="card panel ${S.vault===i?'focus':''}"><div class="big">${two(i+1)}</div><h3>${v[0]}</h3><p>${v[1]}</p><p class="sub">${v[2]}</p></article>`).join('')}</div>
 </section>`},
@@ -511,7 +513,7 @@ getaway:()=>`<section class="scr split">
   <div>${eyebrow('Phase 08 · The Getaway')}
     <h1 ${r(1)}>Plan your getaway.</h1>
     <p class="lead" ${r(2)}>Before you leave this room, write down:</p>
-    <div class="form" ${r(3)}><div><b>01</b>The idea I'm stealing</div><div><b>02</b>My first move</div><div><b>03</b>Who I'll tell this week</div></div>
+    <div class="form" ${r(3)}><div><b>01</b>The idea I'm stealing</div><div><b>02</b>My first move</div><div><b>03</b>My timeline</div></div>
     <div class="sign" ${r(4)}>One idea. One action. One organization<br>ready to do something differently.</div>
   </div>${timerPanel('split')}</section>`,
 
