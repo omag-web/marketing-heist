@@ -601,7 +601,8 @@ function arm(){armedUntil=Date.now()+2500;$('armed').classList.add('on');clearTi
 function disarm(){armedUntil=0;$('armed').classList.remove('on')}
 let alerting=false;
 function go(i){
-  i=Math.max(0,Math.min(PHASES.length-1,i));if(i===S.step||alerting)return;
+  if(alerting){if(i>S.step)endAlarm();return}   // → during the alarm skips straight to the twist screen
+  i=Math.max(0,Math.min(PHASES.length-1,i));if(i===S.step)return;
   const from=cur(),to=PHASES[i];
   for(const k in S.timers)tPause(S.timers[k]);   // clocks only run on their own screen
   if(from.id==='heist'&&to.id==='twist'){fireTwist();return}   // alarm every time you move into the twist
@@ -611,8 +612,13 @@ function fireTwist(){
   alerting=true;S.twistFired=true;S.step=IDX.twist;save();
   const a=$('alert');a.classList.add('on');siren();
   // flash with the siren for 3 s, then hold steady so people can look up and read it
-  setTimeout(()=>a.classList.add('hold'),3000);
-  setTimeout(()=>{a.classList.remove('on','hold');alerting=false;tStart(S.timers.twist);save();render()},CONFIG.twistAlarmSeconds*1000);
+  alarmTimers=[setTimeout(()=>a.classList.add('hold'),3000),setTimeout(endAlarm,CONFIG.twistAlarmSeconds*1000)];
+}
+let alarmTimers=[];
+function endAlarm(){
+  if(!alerting)return;
+  alarmTimers.forEach(clearTimeout);alarmTimers=[];
+  $('alert').classList.remove('on','hold');alerting=false;tStart(S.timers.twist);save();render();
 }
 function selectCrew(n){
   if(n<0||n>=MISSIONS.length)return;
