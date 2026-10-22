@@ -20,9 +20,9 @@ Projector-only presentation for the Marketing Functional Area session at the 202
 | H or ? | Key reference overlay (don't press it live) |
 | Shift+R, Shift+R | Reset the entire session |
 
-**Plot twist:** when the 12-minute Heist clock reaches zero, the alarm fires automatically, the Mission Compromised screen appears, and the 13-minute twist clock starts. To trigger it early, press → twice within 2.5 seconds (a tiny red dot appears bottom-right after the first press).
+**Plot twist:** from The Heist, pressing → once, or the 12-minute clock reaching zero, plays the full-screen alarm, shows the Mission Compromised screen, and starts the 13-minute twist clock.
 
-**Timers keep running** if you leave a phase, so an accidental arrow press loses nothing. State survives a browser refresh. Open `index.html?reset` to start clean after rehearsing.
+**Clocks only run on their own screen.** Leaving a screen pauses its clock. Opening the page starts fresh on the opening screen with every clock full; a refresh or crash within 10 minutes of activity resumes where you were. `index.html?reset` or Shift+R twice also starts clean.
 
 ## Logo
 

@@ -259,6 +259,7 @@ const CONFIG = {
   event: 'NLC-RISC 2026 Staff Conference',
   session: 'Marketing Functional Area',
   pitchSeconds: 120,
+  resumeMinutes: 10,     // a reload within this many minutes resumes where you were; otherwise it starts fresh
   twistAlarmSeconds: 11, // how long the full-screen MISSION COMPROMISED alarm holds before the twist screen
   volume: 0.8,           // master sound level, 0–1 (M key mutes)
   music: 'assets/Sly Minor Motif.mp3', // loops on the opening and closing screens
@@ -317,6 +318,9 @@ function load(){
     if(/[?&]reset\b/.test(location.search)){localStorage.removeItem(CONFIG.storageKey);history.replaceState(null,'',location.pathname)}
     const d=JSON.parse(localStorage.getItem(CONFIG.storageKey)||'null');
     if(!d||typeof d!=='object')return;
+    // Restore only a session that was live moments ago (accidental refresh or crash).
+    // Anything older, like a rehearsal, opens fresh on the opening screen with every clock full.
+    if(!Number.isFinite(d.savedAt)||Date.now()-d.savedAt>CONFIG.resumeMinutes*60000)return;
     if(Number.isInteger(d.step)&&d.step>=0&&d.step<PHASES.length)S.step=d.step;
     if(d.timers&&typeof d.timers==='object'){
       for(const id in S.timers){const t=d.timers[id];if(!t)continue;
@@ -332,7 +336,7 @@ function load(){
     if(Number.isInteger(d.vault)&&d.vault>=-1&&d.vault<VAULT.length)S.vault=d.vault;
   }catch(_){}
 }
-function save(){try{localStorage.setItem(CONFIG.storageKey,JSON.stringify(S))}catch(_){}}
+function save(){S.savedAt=Date.now();try{localStorage.setItem(CONFIG.storageKey,JSON.stringify(S))}catch(_){}}
 
 /* =========================================================
    TIMERS — end-time based; keep running in background if you
@@ -578,11 +582,12 @@ function paintTimer(){
 function tick(){
   const now=Date.now();let changed=false;
   for(const id in S.timers){const t=S.timers[id];
-    if(t.end&&t.end<=now){t.end=null;t.rem=0;changed=true;
-      if(!t.fin){t.fin=true;if(t===curT()){
-        // Heist clock hits zero while on the Heist screen: fire the twist alarm automatically
-        if(id==='heist'&&!S.twistFired&&!alerting){disarm();fireTwist()}else timeUp();
-      }}}}
+    if(t.end&&t.end<=now){t.end=null;t.rem=0;changed=true}
+    if(!t.end&&t.rem===0&&!t.fin){t.fin=true;changed=true;   // reached zero (countdown or the − key)
+      if(t===curT()){
+        // Heist clock hits zero on the Heist screen: fire the twist alarm automatically
+        if(id==='heist'&&!alerting)fireTwist();else timeUp();
+      }}}
   if(changed)save();
   paintTimer();paintClock();
 }
@@ -598,11 +603,8 @@ let alerting=false;
 function go(i){
   i=Math.max(0,Math.min(PHASES.length-1,i));if(i===S.step||alerting)return;
   const from=cur(),to=PHASES[i];
-  if(from.id==='heist'&&to.id==='twist'){
-    if(Date.now()>armedUntil){arm();return}       // first press only arms (tiny dot bottom-right)
-    disarm();tPause(S.timers.heist);
-    if(!S.twistFired){fireTwist();return}
-  }
+  for(const k in S.timers)tPause(S.timers[k]);   // clocks only run on their own screen
+  if(from.id==='heist'&&to.id==='twist'){fireTwist();return}   // alarm every time you move into the twist
   S.step=i;save();render();
 }
 function fireTwist(){
@@ -632,7 +634,7 @@ function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('on');c
 function buildHelp(){
   const rows=[['→  /  Page Down','Next phase'],['←  /  Page Up','Previous phase'],['Space','Start / pause timer'],['+  /  −','Add / remove 1 minute'],['R  R','Reset timer (press twice)'],['F','Full screen'],['B  or  .','Blank screen'],['M','Sound on / off'],['1–6','Reveal: select crew (resets pitch clock)'],['D','Reveal: mark pitch done'],['1–2  /  0','Vault: spotlight a question / clear'],['H  or  ?','This help'],['Shift+R  ×2','Reset the entire session']];
   $('help').innerHTML=`<div class="box panel"><h3>Mission Control · Keys</h3><dl>${rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
-  <div class="h-note">When the 12-minute Heist clock hits zero, the twist alarm fires on its own. To trigger it early, press → twice within 2.5 s.<br>Timers keep running if you leave a phase. Add ?reset to the URL to start clean.</div></div>`;
+  <div class="h-note">From The Heist, → (or the clock reaching zero) fires the twist alarm.<br>Clocks only run on their own screen. Reopening the page starts fresh; a refresh within 10 minutes resumes.</div></div>`;
 }
 
 /* =========================================================
@@ -700,6 +702,7 @@ document.addEventListener('mousemove',poke);
    ========================================================= */
 load();buildHelp();renderHud();fit();render();paintClock();poke();wake();
 setInterval(tick,200);
+setInterval(save,15000);   // keeps the resume window fresh during long phases
 })();
 </script>
 </body>
