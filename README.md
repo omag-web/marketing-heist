@@ -16,7 +16,7 @@ Projector-only presentation for the Marketing Functional Area session at the 202
 | M | Sound on / off |
 | 1–6 | Reveal: select crew (resets the 2:00 pitch clock) |
 | D | Reveal: mark selected crew's pitch done |
-| 1–3 / 0 | Vault: spotlight a question / clear |
+| 1–2 / 0 | Vault: spotlight a question / clear |
 | H or ? | Key reference overlay (don't press it live) |
 | Shift+R, Shift+R | Reset the entire session |
 

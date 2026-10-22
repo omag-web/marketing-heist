@@ -176,15 +176,15 @@ h1.md{font-size:84px}
 /* ---------- VAULT ---------- */
 .vault{display:flex;gap:26px;flex:1}
 .lead.vault-call{margin-top:14px;font-size:30px;color:var(--text)}
-.vault .card{flex:1;padding:30px 36px;gap:10px}
-.vault .card h3{font-size:48px}
-.vault .card p{font-size:29px}
-.vault .card .sub{font-size:24px;color:var(--dim);margin-top:auto}
+.vault .card{flex:1;padding:32px 40px;gap:12px}
+.vault .card h3{font-size:60px}
+.vault .card p{font-size:36px}
+.vault .card .sub{font-size:27px;color:var(--dim);margin-top:auto}
 .vault .big{font:700 80px/1 var(--display);color:rgba(229,50,45,.9)}
 .vault[data-focus] .card{opacity:.32}
 .vault[data-focus] .card.focus{opacity:1;flex:2.1;border-color:var(--red);box-shadow:0 0 0 2px var(--red),0 0 60px rgba(229,50,45,.3)}
-.vault[data-focus] .card.focus h3{font-size:64px}
-.vault[data-focus] .card.focus p{font-size:36px}
+.vault[data-focus] .card.focus h3{font-size:68px}
+.vault[data-focus] .card.focus p{font-size:40px}
 
 /* ---------- TAKE / GETAWAY ---------- */
 .quote{margin-top:44px;font:600 44px/1.2 var(--display);text-transform:uppercase;padding-left:34px;border-left:6px solid var(--red);max-width:1060px}
@@ -272,7 +272,12 @@ const MISSIONS = [
   {title:'One-Person Crew', goal:'Build a repeatable way to prioritize and produce content.'}
 ];
 
-const AGENDA = [['The Briefing',10],['Casing the Joint',10],['The Heist',25],['The Reveal',20],['Break',10],['The Vault',30],['The Take',10],['The Getaway',5]];
+const VAULT = [
+  ['The Big Score','What worked at your organization, and what tool or workflow made it easier?','Campaigns, projects, templates, software, AI. What did you do, and what happened? Show and tell.'],
+  ['The Unsolved Case',"What problem haven't you cracked yet?",'Name it. Someone in this room may have the answer.']
+];
+
+const AGENDA = [['The Briefing',10],['Casing the Joint',10],['The Heist',25],['The Reveal',20],['Break',10],['The Vault',12],['The Take',10],['The Getaway',5]];
 
 const PHASES = [
   {id:'standby',  agenda:-1, timer:0},
@@ -282,7 +287,7 @@ const PHASES = [
   {id:'twist',    agenda:2,  timer:13*60},
   {id:'reveal',   agenda:3,  timer:CONFIG.pitchSeconds},
   {id:'break',    agenda:4,  timer:10*60},
-  {id:'vault',    agenda:5,  timer:30*60},
+  {id:'vault',    agenda:5,  timer:12*60},
   {id:'take',     agenda:6,  timer:10*60},
   {id:'getaway',  agenda:7,  timer:5*60},
   {id:'complete', agenda:-1, timer:0}
@@ -315,7 +320,7 @@ function load(){
     if(Number.isInteger(d.crew)&&d.crew>=-1&&d.crew<MISSIONS.length)S.crew=d.crew;
     if(Array.isArray(d.done))S.done=d.done.filter(n=>Number.isInteger(n)&&n>=0&&n<MISSIONS.length);
     S.twistFired=!!d.twistFired;S.muted=!!d.muted;
-    if(Number.isInteger(d.vault)&&d.vault>=-1&&d.vault<3)S.vault=d.vault;
+    if(Number.isInteger(d.vault)&&d.vault>=-1&&d.vault<VAULT.length)S.vault=d.vault;
   }catch(_){}
 }
 function save(){try{localStorage.setItem(CONFIG.storageKey,JSON.stringify(S))}catch(_){}}
@@ -444,7 +449,7 @@ briefing:()=>`<section class="scr split">
     <p class="lead" ${r(2)}>Everyone here has solved a problem someone else is still stuck on. Today we find those ideas, pressure-test them, and take the best ones home.</p>
     <div class="rules" ${r(3)}><div class="rules-h">Rules of engagement</div><div class="rules-row"><span>Share generously.</span><span>Borrow shamelessly.</span><span class="red">Credit freely.</span></div></div>
   </div>
-  <aside class="plan panel" ${r(2)}><div class="plan-h">Operation plan · 120 min</div><ol>${AGENDA.map(([n,m],i)=>`<li><span class="n">${two(i+1)}</span><span class="nm">${n}</span><span class="mn">${m} min</span></li>`).join('')}</ol></aside>
+  <aside class="plan panel" ${r(2)}><div class="plan-h">Operation plan · ${AGENDA.reduce((a,[,m])=>a+m,0)} min</div><ol>${AGENDA.map(([n,m],i)=>`<li><span class="n">${two(i+1)}</span><span class="nm">${n}</span><span class="mn">${m} min</span></li>`).join('')}</ol></aside>
 </section>`,
 
 casing:()=>`<section class="scr split">
@@ -489,9 +494,7 @@ break:()=>`<section class="scr center">
   <p class="lead" ${r(4)} style="text-align:center">When we return, we open the Vault.</p>
 </section>`,
 
-vault:()=>{const V=[['The Big Score','What campaign, project, or strategy worked at your organization?','What did you do, what did it take, what happened?'],
-  ['Tools of the Trade','What tool, workflow, or template makes your work easier?','Software, AI, templates, processes. Show and tell.'],
-  ['The Unsolved Case',"What problem haven't you cracked yet?",'Name it. Someone in this room may have the answer.']];
+vault:()=>{const V=VAULT;
   return `<section class="scr stack" style="gap:30px">
   <div class="head"><div>${eyebrow('Phase 06 · The Vault')}
     <h1 class="md" ${r(1)}>Open the vault.</h1>
@@ -613,7 +616,7 @@ function toggleDone(){
 let toastT=null;
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),1700)}
 function buildHelp(){
-  const rows=[['→  /  Page Down','Next phase'],['←  /  Page Up','Previous phase'],['Space','Start / pause timer'],['+  /  −','Add / remove 1 minute'],['R  R','Reset timer (press twice)'],['F','Full screen'],['B  or  .','Blank screen'],['M','Sound on / off'],['1–6','Reveal: select crew (resets pitch clock)'],['D','Reveal: mark pitch done'],['1–3  /  0','Vault: spotlight a question / clear'],['H  or  ?','This help'],['Shift+R  ×2','Reset the entire session']];
+  const rows=[['→  /  Page Down','Next phase'],['←  /  Page Up','Previous phase'],['Space','Start / pause timer'],['+  /  −','Add / remove 1 minute'],['R  R','Reset timer (press twice)'],['F','Full screen'],['B  or  .','Blank screen'],['M','Sound on / off'],['1–6','Reveal: select crew (resets pitch clock)'],['D','Reveal: mark pitch done'],['1–2  /  0','Vault: spotlight a question / clear'],['H  or  ?','This help'],['Shift+R  ×2','Reset the entire session']];
   $('help').innerHTML=`<div class="box panel"><h3>Mission Control · Keys</h3><dl>${rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
   <div class="h-note">Heist → Twist needs two presses of → within 2.5 s (a small red dot appears bottom-right after the first).<br>Timers keep running if you leave a phase. Add ?reset to the URL to start clean.</div></div>`;
 }
@@ -651,7 +654,7 @@ document.addEventListener('keydown',e=>{
     default:
       if(/^[1-9]$/.test(k)){const n=+k-1;
         if(p.id==='reveal')selectCrew(n);
-        else if(p.id==='vault'&&n<3){S.vault=S.vault===n?-1:n;save();render()}
+        else if(p.id==='vault'&&n<VAULT.length){S.vault=S.vault===n?-1:n;save();render()}
       }else handled=false;
   }
   if(handled)e.preventDefault();
