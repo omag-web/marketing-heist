@@ -20,7 +20,7 @@ Projector-only presentation for the Marketing Functional Area session at the 202
 | H or ? | Key reference overlay (don't press it live) |
 | Shift+R, Shift+R | Reset the entire session |
 
-**Plot twist guard:** from The Heist, the first → only arms the twist (a tiny red dot appears bottom-right). Press → again within 2.5 seconds to fire the alarm. The twist timer starts automatically.
+**Plot twist:** when the 12-minute Heist clock reaches zero, the alarm fires automatically, the Mission Compromised screen appears, and the 13-minute twist clock starts. To trigger it early, press → twice within 2.5 seconds (a tiny red dot appears bottom-right after the first press).
 
 **Timers keep running** if you leave a phase, so an accidental arrow press loses nothing. State survives a browser refresh. Open `index.html?reset` to start clean after rehearsing.
 

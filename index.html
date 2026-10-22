@@ -576,7 +576,10 @@ function tick(){
   const now=Date.now();let changed=false;
   for(const id in S.timers){const t=S.timers[id];
     if(t.end&&t.end<=now){t.end=null;t.rem=0;changed=true;
-      if(!t.fin){t.fin=true;if(t===curT())timeUp()}}}
+      if(!t.fin){t.fin=true;if(t===curT()){
+        // Heist clock hits zero while on the Heist screen: fire the twist alarm automatically
+        if(id==='heist'&&!S.twistFired&&!alerting){disarm();fireTwist()}else timeUp();
+      }}}}
   if(changed)save();
   paintTimer();paintClock();
 }
@@ -624,7 +627,7 @@ function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('on');c
 function buildHelp(){
   const rows=[['→  /  Page Down','Next phase'],['←  /  Page Up','Previous phase'],['Space','Start / pause timer'],['+  /  −','Add / remove 1 minute'],['R  R','Reset timer (press twice)'],['F','Full screen'],['B  or  .','Blank screen'],['M','Sound on / off'],['1–6','Reveal: select crew (resets pitch clock)'],['D','Reveal: mark pitch done'],['1–2  /  0','Vault: spotlight a question / clear'],['H  or  ?','This help'],['Shift+R  ×2','Reset the entire session']];
   $('help').innerHTML=`<div class="box panel"><h3>Mission Control · Keys</h3><dl>${rows.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
-  <div class="h-note">Heist → Twist needs two presses of → within 2.5 s (a small red dot appears bottom-right after the first).<br>Timers keep running if you leave a phase. Add ?reset to the URL to start clean.</div></div>`;
+  <div class="h-note">When the 12-minute Heist clock hits zero, the twist alarm fires on its own. To trigger it early, press → twice within 2.5 s.<br>Timers keep running if you leave a phase. Add ?reset to the URL to start clean.</div></div>`;
 }
 
 /* =========================================================
