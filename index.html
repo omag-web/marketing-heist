@@ -202,6 +202,8 @@ h1.md{font-size:84px}
 /* ---------- OVERLAYS ---------- */
 #alert{position:absolute;inset:0;z-index:50;display:none;place-items:center;overflow:hidden}
 #alert.on{display:grid;animation:alertbg .42s steps(1) infinite}
+#alert.on.hold{animation:none;background:#5a0907}
+#alert.hold h2{animation:none;text-shadow:6px 0 rgba(255,75,62,.6),-6px 0 rgba(72,215,255,.35)}
 @keyframes alertbg{0%{background:#160203}50%{background:#6b0b08}}
 #alert .stripe{position:absolute;left:-40px;right:-40px;height:64px;background:repeating-linear-gradient(-45deg,var(--red) 0 44px,#111 44px 88px);animation:stripe .8s linear infinite}
 #alert .stripe.t{top:70px}#alert .stripe.b{bottom:70px}
@@ -257,6 +259,7 @@ const CONFIG = {
   event: 'NLC-RISC 2026 Staff Conference',
   session: 'Marketing Functional Area',
   pitchSeconds: 120,
+  twistAlarmSeconds: 11, // how long the full-screen MISSION COMPROMISED alarm holds before the twist screen
   volume: 0.8,           // master sound level, 0–1 (M key mutes)
   music: 'assets/Sly Minor Motif.mp3', // loops on the opening and closing screens
   musicVolume: 0.36,     // 0–1
@@ -605,7 +608,9 @@ function go(i){
 function fireTwist(){
   alerting=true;S.twistFired=true;S.step=IDX.twist;save();
   const a=$('alert');a.classList.add('on');siren();
-  setTimeout(()=>{a.classList.remove('on');alerting=false;tStart(S.timers.twist);save();render()},2900);
+  // flash with the siren for 3 s, then hold steady so people can look up and read it
+  setTimeout(()=>a.classList.add('hold'),3000);
+  setTimeout(()=>{a.classList.remove('on','hold');alerting=false;tStart(S.timers.twist);save();render()},CONFIG.twistAlarmSeconds*1000);
 }
 function selectCrew(n){
   if(n<0||n>=MISSIONS.length)return;
