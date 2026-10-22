@@ -180,7 +180,8 @@ h1.md{font-size:84px}
 .vault .card h3{font-size:60px}
 .vault .card p{font-size:36px}
 .vault .card .sub{font-size:27px;color:var(--dim);margin-top:auto}
-.vault .big{font:700 80px/1 var(--display);color:rgba(229,50,45,.9)}
+.vault .big{font:700 80px/1 var(--display);color:rgba(229,50,45,.9);display:flex;justify-content:space-between;align-items:flex-start}
+.vault .big .mins{font:600 22px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-top:10px}
 .vault[data-focus] .card{opacity:.32}
 .vault[data-focus] .card.focus{opacity:1;flex:2.1;border-color:var(--red);box-shadow:0 0 0 2px var(--red),0 0 60px rgba(229,50,45,.3)}
 .vault[data-focus] .card.focus h3{font-size:68px}
@@ -273,11 +274,12 @@ const MISSIONS = [
 ];
 
 const VAULT = [
-  ['The Big Score','What worked at your organization, and what tool or workflow made it easier?','Campaigns, projects, templates, software, AI. What did you do, and what happened? Show and tell.'],
-  ['The Unsolved Case',"What problem haven't you cracked yet?",'Name it. Someone in this room may have the answer.']
+  ['The Big Score','What worked at your organization, and what tool or workflow made it easier?','Campaigns, projects, templates, software, AI. What did you do, and what happened? Show and tell.',12],
+  ['The Unsolved Case',"What problem haven't you cracked yet?",'Name it. Someone in this room may have the answer.',18]
 ];
+// Each Vault question has its own clock: 'vault' = question 1, 'vault2' = question 2. Pressing 1/2 switches clocks.
 
-const AGENDA = [['The Briefing',10],['Casing the Joint',10],['The Heist',25],['The Reveal',20],['Break',10],['The Vault',12],['The Take',10],['The Getaway',5]];
+const AGENDA = [['The Briefing',10],['Casing the Joint',10],['The Heist',25],['The Reveal',20],['Break',10],['The Vault',30],['The Take',10],['The Getaway',5]];
 
 const PHASES = [
   {id:'standby',  agenda:-1, timer:0},
@@ -287,7 +289,7 @@ const PHASES = [
   {id:'twist',    agenda:2,  timer:13*60},
   {id:'reveal',   agenda:3,  timer:CONFIG.pitchSeconds},
   {id:'break',    agenda:4,  timer:10*60},
-  {id:'vault',    agenda:5,  timer:12*60},
+  {id:'vault',    agenda:5,  timer:VAULT[0][3]*60},
   {id:'take',     agenda:6,  timer:10*60},
   {id:'getaway',  agenda:7,  timer:5*60},
   {id:'complete', agenda:-1, timer:0}
@@ -299,7 +301,7 @@ const IDX = Object.fromEntries(PHASES.map((p,i)=>[p.id,i]));
    ========================================================= */
 const stage=document.getElementById('stage'), scr=document.getElementById('screen');
 const $=id=>document.getElementById(id);
-function freshTimers(){const t={};PHASES.forEach(p=>{if(p.timer)t[p.id]={dur:p.timer,rem:p.timer,end:null,fin:false}});return t}
+function freshTimers(){const t={};PHASES.forEach(p=>{if(p.timer)t[p.id]={dur:p.timer,rem:p.timer,end:null,fin:false}});t.vault2={dur:VAULT[1][3]*60,rem:VAULT[1][3]*60,end:null,fin:false};return t}
 function freshState(){return {step:0,timers:freshTimers(),crew:-1,done:[],twistFired:false,muted:false,vault:-1}}
 let S=freshState();
 
@@ -330,7 +332,7 @@ function save(){try{localStorage.setItem(CONFIG.storageKey,JSON.stringify(S))}ca
    navigate away, so an accidental arrow press loses nothing
    ========================================================= */
 const cur=()=>PHASES[S.step];
-const curT=()=>S.timers[cur().id]||null;
+const curT=()=>(cur().id==='vault'&&S.vault===1)?S.timers.vault2:(S.timers[cur().id]||null);
 const rem=t=>t.end?Math.max(0,Math.ceil((t.end-Date.now())/1000)):t.rem;
 function tStart(t){if(t.end||t.rem<=0)return;t.end=Date.now()+t.rem*1000;t.fin=false}
 function tPause(t){if(!t.end)return;t.rem=rem(t);t.end=null}
@@ -501,7 +503,7 @@ vault:()=>{const V=VAULT;
     <p class="lead" ${r(2)}>No more case files. Real campaigns, real tools, real problems from the people in this room.</p>
     <p class="lead vault-call" ${r(3)}><span class="red">Every great heist needs a score.</span> Share one real success, one tool worth borrowing, or one problem the crew can help crack.</p></div>
     ${timerPanel('compact')}</div>
-  <div class="vault" ${S.vault>=0?`data-focus="${S.vault}"`:''} ${r(3)}>${V.map((v,i)=>`<article class="card panel ${S.vault===i?'focus':''}"><div class="big">${two(i+1)}</div><h3>${v[0]}</h3><p>${v[1]}</p><p class="sub">${v[2]}</p></article>`).join('')}</div>
+  <div class="vault" ${S.vault>=0?`data-focus="${S.vault}"`:''} ${r(3)}>${V.map((v,i)=>`<article class="card panel ${S.vault===i?'focus':''}"><div class="big">${two(i+1)}<span class="mins">${v[3]} min</span></div><h3>${v[0]}</h3><p>${v[1]}</p><p class="sub">${v[2]}</p></article>`).join('')}</div>
 </section>`},
 
 take:()=>`<section class="scr split">
@@ -570,7 +572,7 @@ function tick(){
   const now=Date.now();let changed=false;
   for(const id in S.timers){const t=S.timers[id];
     if(t.end&&t.end<=now){t.end=null;t.rem=0;changed=true;
-      if(!t.fin){t.fin=true;if(id===cur().id)timeUp()}}}
+      if(!t.fin){t.fin=true;if(t===curT())timeUp()}}}
   if(changed)save();
   paintTimer();paintClock();
 }
@@ -650,11 +652,11 @@ document.addEventListener('keydown',e=>{
     case 'h':case 'H':case '?':help.classList.toggle('on');break;
     case 'Escape':help.classList.remove('on');break;
     case 'd':case 'D':if(p.id==='reveal')toggleDone();break;
-    case '0':if(p.id==='vault'){S.vault=-1;save();render()}break;
+    case '0':if(p.id==='vault'){tPause(S.timers.vault2);S.vault=-1;save();render()}break;
     default:
       if(/^[1-9]$/.test(k)){const n=+k-1;
         if(p.id==='reveal')selectCrew(n);
-        else if(p.id==='vault'&&n<VAULT.length){S.vault=S.vault===n?-1:n;save();render()}
+        else if(p.id==='vault'&&n<VAULT.length){const before=curT();S.vault=S.vault===n?-1:n;if(curT()!==before)tPause(before);save();render()}
       }else handled=false;
   }
   if(handled)e.preventDefault();
